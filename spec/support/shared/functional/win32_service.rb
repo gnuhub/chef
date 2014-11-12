@@ -1,4 +1,6 @@
 
+require 'chef/application/windows_service_manager'
+
 shared_context "using Win32::Service" do
   # Some helper methods.
 
@@ -55,5 +57,4 @@ shared_context "using Win32::Service" do
   let(:test_service_file) {
     "#{ENV['SystemDrive']}\\windows\\temp\\spec_service_file"
   }
-  
 end
