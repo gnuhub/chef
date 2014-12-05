@@ -88,6 +88,13 @@ class Chef
         @service_display_name = service_options[:service_display_name]
         @service_description = service_options[:service_description]
         @service_file_path = service_options[:service_file_path]
+        @service_start_name = service_options[:run_as]
+        @password = service_options[:run_as_password]
+
+        # i.e. if only one of them is set.
+        if [@service_start_name, @password].compact.size == 1
+          raise ArgumentError, "Service definition requires either both or neither of :run_as and :run_as_password"
+        end
       end
 
       def run(params = ARGV)
@@ -116,7 +123,9 @@ class Chef
                                  # and we don't want that, so we need to override the service type.
                                  :service_type     => ::Win32::Service::SERVICE_WIN32_OWN_PROCESS,
                                  :start_type       => ::Win32::Service::SERVICE_AUTO_START,
-                                 :binary_path_name => cmd
+                                 :binary_path_name => cmd,
+                                 :service_start_name => @service_start_name,
+                                 :password => @password,
                                  )
             puts "Service '#{@service_name}' has successfully been installed."
           end

@@ -24,7 +24,7 @@ end
 #
 # ATTENTION:
 # This test creates a windows service for testing purposes and runs it
-# as Local System on windows boxes.
+# as Local System (or an otherwise specified user) on windows boxes.
 # This test will fail if you run the tests inside a Windows VM by
 # sharing the code from your host since Local System account by
 # default can't see the mounted partitions.
@@ -48,6 +48,14 @@ describe "Chef::Application::WindowsServiceManager", :windows_only, :system_wind
         service_def.delete(key)
 
         expect { Chef::Application::WindowsServiceManager.new(service_def) }.to raise_error(ArgumentError)
+      end
+    end
+
+    it "throws an error when given a username without password or vice versa" do
+      [:run_as, :run_as_password].each do |key|
+        service_def = test_service.dup
+        service_def[key] = "narf"
+        lambda { Chef::Application::WindowsServiceManager.new(service_def) }.should raise_error(ArgumentError)
       end
     end
   end
