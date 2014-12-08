@@ -35,7 +35,7 @@ describe Chef::Resource::WindowsService, :windows_only, :system_windows_service_
   }
 
   let(:global_service_file_path) {
-    "#{ENV['SystemDrive']}\\windows\\temp\\#{File.basename(test_service[:service_file_path])}"
+    "#{ENV['WINDIR']}\\temp\\#{File.basename(test_service[:service_file_path])}"
   }
 
   let(:service_params) {
