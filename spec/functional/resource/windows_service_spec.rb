@@ -65,7 +65,8 @@ describe Chef::Resource::WindowsService, :windows_only, :system_windows_service_
     # if you don't make the file executable by the service user, you'll get
     # the not-very-helpful "service did not respond fast enough" error.
     file = Chef::Resource::File.new(global_service_file_path, run_context)
-    # this may break in a post-Windows 8.1 release, and have to be replaced with the rights stuff in the file resource.
+    # this may break in a post-Windows 8.1 release, and have to be replaced
+    # with the rights stuff in the file resource.
     file.mode("0777")
     file.run_action(:create)
 

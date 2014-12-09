@@ -270,11 +270,9 @@ EOS
 
       cmd = %Q{secedit.exe /configure /db #{dbfile} /cfg "#{policy_file.path}" /areas USER_RIGHTS SECURITYPOLICY SERVICES /log "#{logfile}"}
       Chef::Log.debug "Granting logon-as-service privilege with: #{cmd}"
-      runner = Mixlib::ShellOut.new(cmd)
-      runner.run_command
-      output = runner.stdout
+      runner = shell_out(cmd)
 
-      if output !~ /The task has completed successfully/
+      if runner.exitstatus != 0
         Chef::Log.fatal "Logon-as-service grant failed with output: #{output}"
         raise Chef::Exceptions::Service, "Logon grant failed with policy file #{policy_file.path}. You can look at #{logfile} for details, or do `secedit /analyze #{dbfile}."
       end
