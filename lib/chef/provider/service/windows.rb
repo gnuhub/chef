@@ -265,7 +265,10 @@ EOS
       policy_file.puts(policy_text)
       policy_file.close   # need to flush the buffer.
 
-      cmd = %Q{secedit.exe /configure /db "secedit.sdb" /cfg "#{policy_file.path}" /areas USER_RIGHTS SECURITYPOLICY SERVICES /log "#{logfile}"}
+      # this is just an audit file, we'll delete with the others if everything succeeded.
+      dbfile = "#{ENV['TEMP']}\\secedit.sdb"
+
+      cmd = %Q{secedit.exe /configure /db #{dbfile} /cfg "#{policy_file.path}" /areas USER_RIGHTS SECURITYPOLICY SERVICES /log "#{logfile}"}
       Chef::Log.debug "Granting logon-as-service privilege with: #{cmd}"
       runner = Mixlib::ShellOut.new(cmd)
       runner.run_command
@@ -273,11 +276,12 @@ EOS
 
       if output !~ /The task has completed successfully/
         Chef::Log.fatal "Logon-as-service grant failed with output: #{output}"
-        raise Chef::Exceptions::Service, "Logon grant failed with policy file #{policy_file.path}. Please see #{logfile} for details."
+        raise Chef::Exceptions::Service, "Logon grant failed with policy file #{policy_file.path}. You can look at #{logfile} for details, or do `secedit /analyze #{dbfile}."
       end
 
       Chef::Log.info "Grant logon-as-service to user '#{username}' successful."
 
+      ::File.delete(dbfile)
       ::File.delete(policy_file)
       ::File.delete(logfile) rescue nil     # logfile is not always present at end.
     end
